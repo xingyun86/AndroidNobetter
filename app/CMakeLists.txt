@@ -9,6 +9,50 @@ cmake_minimum_required(VERSION 3.4.1)
 # You can define multiple libraries, and CMake builds it for you.
 # Gradle automatically packages shared libraries with your APK.
 
+include_directories(src/main/cpp/libjson-1.8.0)
+link_directories(src/main/cpp/libjson-1.8.0)
+add_library( # Sets the name of the library.
+            json
+
+            # Sets the library as a shared library.
+            # SHARED
+            STATIC
+
+            # Provides a relative path to your source file(s).
+            # Associated headers in the same location as their source
+            # file are automatically included.
+             src/main/cpp/libjson-1.8.0/json_reader.cpp
+             src/main/cpp/libjson-1.8.0/json_value.cpp
+             src/main/cpp/libjson-1.8.0/json_writer.cpp)
+
+include_directories(src/main/cpp/zlib-1.2.8)
+link_directories(src/main/cpp/zlib-1.2.8)
+add_library( # Sets the name of the library.
+            zlib
+
+            # Sets the library as a shared library.
+            # SHARED
+            STATIC
+
+            # Provides a relative path to your source file(s).
+            # Associated headers in the same location as their source
+            # file are automatically included.
+             src/main/cpp/zlib-1.2.8/adler32.c
+             src/main/cpp/zlib-1.2.8/compress.c
+             src/main/cpp/zlib-1.2.8/crc32.c
+             src/main/cpp/zlib-1.2.8/deflate.c
+             src/main/cpp/zlib-1.2.8/gzclose.c
+             src/main/cpp/zlib-1.2.8/gzlib.c
+             src/main/cpp/zlib-1.2.8/gzread.c
+             src/main/cpp/zlib-1.2.8/gzwrite.c
+             src/main/cpp/zlib-1.2.8/infback.c
+             src/main/cpp/zlib-1.2.8/inflate.c
+             src/main/cpp/zlib-1.2.8/inftrees.c
+             src/main/cpp/zlib-1.2.8/inffast.c
+             src/main/cpp/zlib-1.2.8/trees.c
+             src/main/cpp/zlib-1.2.8/uncompr.c
+             src/main/cpp/zlib-1.2.8/zutil.c)
+
 include_directories(src/main/cpp/libjpeg-turbo-1.5.0)
 link_directories(src/main/cpp/libjpeg-turbo-1.5.0)
 add_library( # Sets the name of the library.
@@ -90,8 +134,22 @@ add_library( # Sets the name of the library.
             src/main/cpp/libjpeg-turbo-1.5.0/wrrle.c
             src/main/cpp/libjpeg-turbo-1.5.0/wrtarga.c )
 
+set(LIBCURL_PATH D:/DevelopmentEnvironment/Workspaces/Android/AndroidNobetter/app/src/main/cpp/libcurl-ssl-7.52.1)
+include_directories(${LIBCURL_PATH}/include)
 add_library( # Sets the name of the library.
-             native-lib
+            curl
+
+            # Sets the library as a shared library.
+            # SHARED
+            STATIC
+
+            IMPORTED
+            )
+
+set_target_properties(curl PROPERTIES IMPORTED_LOCATION ${LIBCURL_PATH}/${ANDROID_ABI}/libcurl.a)
+
+add_library( # Sets the name of the library.
+             nativehelper-lib
 
              # Sets the library as a shared library.
              SHARED
@@ -99,7 +157,16 @@ add_library( # Sets the name of the library.
              # Provides a relative path to your source file(s).
              # Associated headers in the same location as their source
              # file are automatically included.
-             src/main/cpp/native-lib.cpp )
+             src/main/cpp/nativehelper-lib.cpp
+             src/main/cpp/utils/mobile.cpp
+             src/main/cpp/utils/md5.cpp
+             src/main/cpp/utils/curl_helper.cpp
+             src/main/cpp/utils/img_conv.cpp
+             src/main/cpp/utils/base64.cpp
+             src/main/cpp/utils/crypt_helper.cpp
+             src/main/cpp/utils/rijndael.cpp
+             src/main/cpp/utils/utils.cpp
+             )
 
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because system libraries are included in the search path by
@@ -119,9 +186,12 @@ find_library( # Sets the name of the path variable.
 # build script, prebuilt third-party libraries, or system libraries.
 
 target_link_libraries( # Specifies the target library.
-                       native-lib
+                       nativehelper-lib
 
+                       curl
                        jpeg
+                       zlib
+                       json
 
                        # Links the target library to the log library
                        # included in the NDK.
